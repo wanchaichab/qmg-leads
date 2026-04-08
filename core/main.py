@@ -47,12 +47,9 @@ def process_current_batch(batch_id):
             #send_initial_message(lead)
             #update_lead_status(lead.id, "contacted")
             print(f"Sent message to {lead.phone_number} and updated status of {lead.id} to contacted.")
-
-def main():
-    active_batch_id = get_current_batch_id()
-    print(f"Current active batch ID: {active_batch_id}")
-    process_current_batch(active_batch_id)
     
 
 if __name__ == "__main__":
-    main()
+    active_batch_id = get_current_batch_id()
+    print(f"Current active batch ID: {active_batch_id}")
+    process_current_batch(active_batch_id)
