@@ -17,6 +17,8 @@ twilio_toll_free_number = os.environ.get('TWILIO_TOLL_FREE_NUMBER')
 twilio_test_phone_number = os.environ.get('TWILIO_TEST_PHONE_NUMBER')
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 openai_prompt_id = os.environ.get("OPENAI_PROMPT_ID")
+agent_phone = os.environ.get("AGENT_PHONE")
+public_base_url = os.environ.get("PUBLIC_BASE_URL")
 
 client = Client(account_sid, auth_token)
 
@@ -26,7 +28,7 @@ def sendInitialMessage(lead):
     message = client.api.account.messages.create(
         to=twilio_test_phone_number,
         from_=twilio_toll_free_number,
-        body=f"Hi {lead.phone_number}, this is QMG toll free. Test #2")
+        body=f"Hi {lead.phone_number}, just following up on that radio promotion answer you got! Because it's our 23rd anniversary, we're actually adding a Carnival Cruise for 2 onto the Cancun, and Orlando stays for the top callers. I didn't want you to miss the bonus since you already did the hard part of calling in. Let me know if you're around for a quick 2-minute chat to get it locked in.")
     
     logMessageToDB(lead.phone_number, "outbound", message.body, message.sid, lead.lead_id)
 
@@ -38,7 +40,7 @@ def generateResponseMessage(recent_messages: list[dict]):
         model="gpt-5-mini",
         prompt={
             "id": openai_prompt_id,
-            "version": "2",
+            "version": "3",
         },
         input=recent_messages,
         text={
@@ -71,7 +73,17 @@ def generateResponseMessage(recent_messages: list[dict]):
     data = json.loads(response.output_text)
 
     return data["reply_message"], data["new_status"]
-
+    
+def initiate_warm_transfer(lead_phone, lead_id):
+    message = client.api.account.messages.create(
+        to=twilio_test_phone_number, #this should be the agent's phone number in production
+        from_=twilio_toll_free_number,
+        body=f"Lead {lead_phone} is ready for transfer. Please reach out to them as soon as possible.")
+    
+    logMessageToDB(agent_phone, "outbound", message.body, message.sid, lead_id)
+    #update_lead_status(lead_id, "transferred")
+    print(f"Updated lead {lead_id} status to transferred.")
+    
 def handleInbound(params: dict):
     from_number = params.get("From").replace("+1", "")
     message_body = params.get("Body")
@@ -86,7 +98,6 @@ def handleInbound(params: dict):
 
     # Log the message to the database
     logMessageToDB(from_number, "inbound", message_body, message_id, lead_id)
-
 
     # Handle STOP messages
     stop_words = {"STOP", "CANCEL", "UNSUBSCRIBE", "END", "QUIT"}
@@ -114,6 +125,13 @@ def handleInbound(params: dict):
     reply_message, new_status = generateResponseMessage(recent_messages)
     print(f"Generated response message: {reply_message}, new status: {new_status}")
     #update_lead_status(lead_id, new_status)
+
+    # Trigger transfer if needed
+    if new_status == "transfer_ready":
+        print(f"Lead {lead_id} is ready for transfer. Triggering transfer process.")
+        # Here you would add code to notify the sales team or trigger the transfer process
+        initiate_warm_transfer(from_number, lead_id)
+    
     twiml.message(reply_message)
     logMessageToDB(from_number, "outbound", reply_message, message_id, lead_id)
     return twiml
