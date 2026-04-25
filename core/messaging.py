@@ -28,7 +28,7 @@ def sendInitialMessage(lead):
     message = client.api.account.messages.create(
         to=twilio_test_phone_number,
         from_=twilio_toll_free_number,
-        body=f"Hi {lead.phone_number}, just following up on that radio promotion answer you got! Because it's our 23rd anniversary, we're actually adding a Carnival Cruise for 2 onto the Cancun, and Orlando stays for the top callers. I didn't want you to miss the bonus since you already did the hard part of calling in. Let me know if you're around for a quick 2-minute chat to get it locked in.")
+        body=f"Hi {lead.phone_number}, just following up on that radio promotion answer you got! Because it's our 23rd anniversary, we've got a special bonus on top of the Cancun, and Orlando stays for the top callers. I didn't want you to miss the bonus since you already did the hard part of calling in. Let me know if you're around for a quick 2-minute chat to get it locked in.")
     
     logMessageToDB(lead.phone_number, "outbound", message.body, message.sid, lead.lead_id)
 
