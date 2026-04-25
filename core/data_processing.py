@@ -14,6 +14,17 @@ raw_file_path = "data/raw"
 
 batch_size = 50
 
+def get_current_batch_id():
+    response = (supabase.table("system_config")
+        .select("value")
+        .eq("key", "current_batch")
+        .execute()
+    )
+    if response.data:
+        return response.data[0]["value"]
+    else:
+        return 0
+
 def process_data(df):
     current_batch = 1
     count = 0
