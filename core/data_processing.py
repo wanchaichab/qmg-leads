@@ -129,13 +129,13 @@ def getRecentMessages(lead_id, limit=3):
     else:
         return []
 
-for file in os.listdir(raw_file_path):
+""" for file in os.listdir(raw_file_path):
     if file.endswith(".csv"):
         file_path = os.path.join(raw_file_path, file)
         df = pd.read_csv(file_path)
         df_pr = process_data(df)
         print(df_pr.head())
         insert_data(df_pr)
-        move_file(file_path, "data/processed")
+        move_file(file_path, "data/processed") """
 
         
