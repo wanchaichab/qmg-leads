@@ -1,7 +1,6 @@
 import os
 from twilio.rest import Client
 from dotenv import load_dotenv
-from celery import Celery
 from core.data_processing import logMessageToDB, getLeadIdByPhoneNumber, getLeadStatus, update_lead_status, getRecentMessages
 from twilio.twiml.messaging_response import MessagingResponse
 from fastapi import Response

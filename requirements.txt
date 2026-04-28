@@ -1,0 +1,6 @@
+fastapi
+twilio
+pandas
+supabase
+python-dotenv
+openai
