@@ -62,15 +62,15 @@ def move_file(file_path, destination_folder):
 def update_lead_status(lead_id, new_status):
     result = (supabase.table("leads")
      .update({"status": new_status, "updated_at": pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")})
-     .eq("id", lead_id)
+     .eq("lead_id", lead_id)
      .execute()
     )
     
     return result.data
 
-def logMessageToDB(from_number, direction, message_body, message_id, fk_lead_id):
+def logMessageToDB(phone_number, direction, message_body, message_id, fk_lead_id):
     data = {
-        "phone_number": from_number,
+        "phone_number": phone_number,
         "direction": direction,
         "content": message_body,
         "message_id": message_id,
@@ -80,9 +80,9 @@ def logMessageToDB(from_number, direction, message_body, message_id, fk_lead_id)
     }
     supabase.table("messages").insert(data).execute()
     if direction == "inbound":
-        print(f"Logged message from {from_number} to the database.")
+        print(f"Logged message from {phone_number} to the database.")
     else:
-        print(f"Logged message to {from_number} to the database.")
+        print(f"Logged message to {phone_number} to the database.")
 
 def getLeadIdByPhoneNumber(phone_number):
     response = (supabase.table("leads")

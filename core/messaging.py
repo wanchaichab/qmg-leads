@@ -25,13 +25,14 @@ openai_client = OpenAI()
 
 def sendInitialMessage(lead):
     message = client.api.account.messages.create(
-        to=twilio_test_phone_number,
+        #to=twilio_test_phone_number,
+        to=lead["phone_number"],
         from_=twilio_toll_free_number,
-        body=f"Hi {lead.phone_number}, just following up on that radio promotion answer you got! Because it's our 23rd anniversary, we've got a special bonus on top of the Cancun, and Orlando stays for the top callers. I didn't want you to miss the bonus since you already did the hard part of calling in. Let me know if you're around for a quick 2-minute chat to get it locked in.")
-    
-    logMessageToDB(lead.phone_number, "outbound", message.body, message.sid, lead.lead_id)
+        #body=f"Hi {lead.phone_number}, just following up on that radio promotion answer you got! Because it's our 23rd anniversary, we've got a special bonus on top of the Cancun, and Orlando stays for the top callers. I didn't want you to miss the bonus since you already did the hard part of calling in. Let me know if you're around for a quick 2-minute chat to get it locked in.")
+        body=f"Hi, just following up on that radio promotion answer you got! Because it's our 23rd anniversary, we've got a special bonus on top of the Cancun, and Orlando stays for the top callers. I didn't want you to miss the bonus since you already did the hard part of calling in. Let me know if you're around for a quick 2-minute chat to get it locked in.")
+    logMessageToDB(lead["phone_number"], "outbound", message.body, message.sid, lead["lead_id"])
 
-    #update_lead_status(lead.lead_id, "message sent")
+    update_lead_status(lead["lead_id"], "message_sent")
 
 def generateResponseMessage(recent_messages: list[dict]):
     # Qualify lead based on recent messages and create response
@@ -75,12 +76,13 @@ def generateResponseMessage(recent_messages: list[dict]):
     
 def initiate_warm_transfer(lead_phone, lead_id):
     message = client.api.account.messages.create(
-        to=twilio_test_phone_number, #this should be the agent's phone number in production
+        #to=twilio_test_phone_number,
+        to=agent_phone,
         from_=twilio_toll_free_number,
-        body=f"Lead {lead_phone} is ready for transfer. Please reach out to them as soon as possible.")
+        body=f"Lead #{lead_phone} is ready for a call.")
     
     logMessageToDB(agent_phone, "outbound", message.body, message.sid, lead_id)
-    #update_lead_status(lead_id, "transferred")
+    update_lead_status(lead_id, "transferred")
     print(f"Updated lead {lead_id} status to transferred.")
     
 def handleInbound(params: dict):
@@ -104,7 +106,7 @@ def handleInbound(params: dict):
     if message_body.strip().upper() in stop_words:
         print("STOP detected")
         if lead_id:
-            #update_lead_status(lead_id, "opted out")
+            update_lead_status(lead_id, "opted out")
             print(f"Updated lead {lead_id} status to opted out.")
         else:
             print(f"No lead found for phone number {from_number}.")
@@ -112,8 +114,8 @@ def handleInbound(params: dict):
     # Update lead status to contacted if it's currently pending
     if lead_id:
         current_status = getLeadStatus(lead_id)
-        if current_status == "message sent" or current_status == "pending":
-            #update_lead_status(lead_id, "responded")
+        if current_status == "message_sent" or current_status == "pending":
+            update_lead_status(lead_id, "responded")
             print(f"Updated lead {lead_id} status to responded.")
         else:
             print(f"Lead {lead_id} has status {current_status}, not updating to responded.")
@@ -123,7 +125,7 @@ def handleInbound(params: dict):
 
     reply_message, new_status = generateResponseMessage(recent_messages)
     print(f"Generated response message: {reply_message}, new status: {new_status}")
-    #update_lead_status(lead_id, new_status)
+    update_lead_status(lead_id, new_status)
 
     # Trigger transfer if needed
     if new_status == "transfer_ready":
