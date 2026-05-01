@@ -6,6 +6,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from fastapi import Response
 from openai import OpenAI
 import json
+import requests
 
 load_dotenv()
 
@@ -18,10 +19,21 @@ openai_api_key = os.environ.get("OPENAI_API_KEY")
 openai_prompt_id = os.environ.get("OPENAI_PROMPT_ID")
 agent_phone = os.environ.get("AGENT_PHONE")
 public_base_url = os.environ.get("PUBLIC_BASE_URL")
+slack_webhook = os.environ.get("SLACK_WEBHOOK")
 
 client = Client(account_sid, auth_token)
 
 openai_client = OpenAI()
+
+def sendSlackNotification(message):
+    payload = {
+        "text": message
+    }
+    try:
+        response = requests.post(slack_webhook, json=payload)
+        print("Slack notification sent successfully.")
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to send Slack notification: {e}")
 
 def sendInitialMessage(lead):
     message = client.api.account.messages.create(
@@ -82,6 +94,7 @@ def initiate_warm_transfer(lead_phone, lead_id):
         body=f"Lead #{lead_phone} is ready for a call.")
     
     logMessageToDB(agent_phone, "outbound", message.body, message.sid, lead_id)
+    sendSlackNotification(message.body)
     update_lead_status(lead_id, "transferred")
     print(f"Updated lead {lead_id} status to transferred.")
     
