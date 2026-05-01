@@ -9,6 +9,7 @@ load_dotenv()
 
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_SECRET")
+processing_batch_size = int(os.environ.get("PROCESSING_BATCH_SIZE", 50))
 supabase = create_client(url, key)
 
 def process_current_batch(batch_id):
@@ -16,7 +17,7 @@ def process_current_batch(batch_id):
         .select("*")
         .eq("batch_id", batch_id)
         .eq("status", "pending")
-        .limit(25)
+        .limit(processing_batch_size)
         .execute()
     )
     leads = response.data or []
