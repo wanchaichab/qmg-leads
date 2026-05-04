@@ -141,7 +141,7 @@ def handleInbound(params: dict):
     update_lead_status(lead_id, new_status)
 
     # Trigger transfer if needed
-    if new_status == "transfer_ready":
+    if new_status == "transfer_ready" and current_status != "transferred":
         print(f"Lead {lead_id} is ready for transfer. Triggering transfer process.")
         # Here you would add code to notify the sales team or trigger the transfer process
         initiate_warm_transfer(from_number, lead_id)
