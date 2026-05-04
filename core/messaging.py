@@ -52,7 +52,7 @@ def generateResponseMessage(recent_messages: list[dict]):
         model="gpt-5-mini",
         prompt={
             "id": openai_prompt_id,
-            "version": "3",
+            "version": "4",
         },
         input=recent_messages,
         text={
