@@ -25,6 +25,11 @@ def get_current_batch_id():
     else:
         return 0
 
+def increment_batch_id():
+    new_batch_id = get_current_batch_id() + 1
+    supabase.table("system_config").update({"value": new_batch_id}).eq("key", "current_batch").execute()
+    print(f"Incremented batch ID to {new_batch_id}")
+
 def process_data(df):
     current_batch = 1
     count = 0

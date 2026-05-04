@@ -3,7 +3,7 @@ import pandas as pd
 from supabase import create_client
 from dotenv import load_dotenv
 from core.messaging import sendInitialMessage
-from core.data_processing import update_lead_status
+from core.data_processing import update_lead_status, increment_batch_id
 
 load_dotenv()
 
@@ -28,3 +28,4 @@ def process_current_batch(batch_id):
         update_lead_status(lead["lead_id"], "message_sent")
         print(f"Sent message to {lead['phone_number']} and updated status of {lead['lead_id']} to message_sent.")
     print(f"Processed #{len(leads)} leads in batch {batch_id}.")
+    increment_batch_id()
