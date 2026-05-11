@@ -52,7 +52,7 @@ def generateResponseMessage(recent_messages: list[dict]):
         model="gpt-5-mini",
         prompt={
             "id": openai_prompt_id,
-            "version": "5",
+            "version": "6",
         },
         input=recent_messages,
         text={
@@ -138,7 +138,8 @@ def handleInbound(params: dict):
 
     reply_message, new_status = generateResponseMessage(recent_messages)
     print(f"Generated response message: {reply_message}, new status: {new_status}")
-    update_lead_status(lead_id, new_status)
+    if current_status != "transfer_ready" or current_status != "transferred":
+        update_lead_status(lead_id, new_status)
 
     # Trigger transfer if needed
     if new_status == "transfer_ready" and current_status != "transferred":
