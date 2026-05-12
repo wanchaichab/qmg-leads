@@ -84,10 +84,10 @@ def logMessageToDB(phone_number, direction, message_body, message_id, fk_lead_id
 
     }
     supabase.table("messages").insert(data).execute()
-    if direction == "inbound":
-        print(f"Logged message from {phone_number} to the database.")
-    else:
-        print(f"Logged message to {phone_number} to the database.")
+    #if direction == "inbound":
+        #print(f"Logged message from {phone_number} to the database.")
+    #else:
+        #print(f"Logged message to {phone_number} to the database.")
 
 def getLeadIdByPhoneNumber(phone_number):
     response = (supabase.table("leads")

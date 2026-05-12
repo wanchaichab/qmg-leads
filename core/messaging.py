@@ -130,15 +130,15 @@ def handleInbound(params: dict):
         if current_status == "message_sent" or current_status == "pending":
             update_lead_status(lead_id, "responded")
             print(f"Updated lead {lead_id} status to responded.")
-        else:
-            print(f"Lead {lead_id} has status {current_status}, not updating to responded.")
+        #else:
+            #print(f"Lead {lead_id} has status {current_status}, not updating to responded.")
 
     # Get recent lead messages for context
     recent_messages = getRecentMessages(lead_id, 3)
 
     reply_message, new_status = generateResponseMessage(recent_messages)
     print(f"Generated response message: {reply_message}, new status: {new_status}")
-    if current_status != "transfer_ready" or current_status != "transferred":
+    if current_status != "transfer_ready" and current_status != "transferred":
         update_lead_status(lead_id, new_status)
 
     # Trigger transfer if needed
