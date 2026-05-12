@@ -20,7 +20,7 @@ openai_prompt_id = os.environ.get("OPENAI_PROMPT_ID")
 agent_phone = os.environ.get("AGENT_PHONE")
 public_base_url = os.environ.get("PUBLIC_BASE_URL")
 slack_webhook = os.environ.get("SLACK_WEBHOOK")
-
+openai_prompt_ver = os.environ.get("OPENAI_PROMPT_VER")
 client = Client(account_sid, auth_token)
 
 openai_client = OpenAI()
@@ -52,7 +52,7 @@ def generateResponseMessage(recent_messages: list[dict]):
         model="gpt-5-mini",
         prompt={
             "id": openai_prompt_id,
-            "version": "6",
+            "version": openai_prompt_ver,
         },
         input=recent_messages,
         text={
