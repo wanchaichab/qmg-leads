@@ -123,6 +123,7 @@ def handleInbound(params: dict):
             print(f"Updated lead {lead_id} status to opted out.")
         else:
             print(f"No lead found for phone number {from_number}.")
+        return twiml
     
     # Update lead status to contacted if it's currently pending
     if lead_id:
